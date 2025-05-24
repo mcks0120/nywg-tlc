@@ -1,5 +1,5 @@
 unit_reference_data = [
-    {'Group': 'NYW', 'Unit Name': 'NY Wing HQ Squadron, inactive', 'Unit Type': 'comp', 'Unit Number': 'NER-NY-000'},
+    {'Group': 'NYW', 'Unit Name': 'NY Wing HQ Squadron, inactive', 'Unit Type': 'senior', 'Unit Number': 'NER-NY-000'},
     {'Group': 'NYW', 'Unit Name': 'New York State Legislative Squadron', 'Unit Type': 'senior', 'Unit Number': 'NER-NY-999'},
     {'Group': 'CMG', 'Unit Name': 'Catskill Mountain Group', 'Unit Type': 'group', 'Unit Number': 'NER-NY-035'},
     {'Group': 'CMG', 'Unit Name': 'Orange County Cadet Squadron', 'Unit Type': 'cadet', 'Unit Number': 'NER-NY-030'},
