@@ -7,9 +7,10 @@ import importlib.util
 file_path = "TLC_Progression.csv"  # Update this if needed
 df = pd.read_csv(file_path)
 
-# === Convert TLC completion date columns ===
+# === Treat "Incomplete" as missing and convert columns to datetime ===
 date_columns = ["OnDemandCompleted", "BasicCompleted", "IntCompleted", "AdvCompleted"]
 for col in date_columns:
+    df[col] = df[col].replace("Incomplete", pd.NA)
     df[col + "_Date"] = pd.to_datetime(df[col], errors='coerce')
 
 # === Define cutoff date (4 years ago) ===
@@ -31,8 +32,9 @@ unit_data = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(unit_data)
 unit_df = pd.DataFrame(unit_data.unit_reference_data)
 
-# === Remove "NER-" prefix from Unit Number, if present ===
+# === Normalize unit numbers for matching (remove "NER-" from both sides) ===
 unit_df["Unit Number"] = unit_df["Unit Number"].str.replace("NER-", "", regex=False)
+tlc_counts["Unit Number"] = tlc_counts["Unit Number"].str.replace("NER-", "", regex=False)
 
 # === Filter to cadet, composite, and flight squadrons only ===
 unit_df = unit_df[unit_df["Unit Type"].isin(["cadet", "comp", "flight"])]
