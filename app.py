@@ -117,3 +117,88 @@ st.download_button(
     file_name="NYWG_TLC_Report.pdf",
     mime="application/pdf"
 )
+from io import BytesIO
+from xhtml2pdf import pisa
+
+st.subheader("Downloadable PDF Report")
+
+# Build same HTML with color-coded compliance
+styled_html = """
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding: 6px;
+        font-size: 12px;
+    }
+    th { background-color: #f2f2f2; }
+    .group-row {
+        background-color: #e0e0e0;
+        font-weight: bold;
+    }
+    .compliant { background-color: #d4edda; }  /* green */
+    .noncompliant { background-color: #f8d7da; }  /* red */
+</style>
+
+<div style='text-align: center;'>
+    <img src='https://raw.githubusercontent.com/mcks0120/nywg-tlc/main/298903439_5485841021479213_274053999167640142_n.png' width='120'/>
+    <h2 style='margin-bottom: 0;'>NYWG Training Leader of Cadets</h2>
+    <h4 style='margin-top: 4px;'>Subordinate Unit Compliance</h4>
+</div>
+<br>
+<table>
+    <tr>
+        <th>Group</th>
+        <th>Squadron</th>
+        <th>Compliant?</th>
+        <th>Valid TLC</th>
+        <th>Total Members</th>
+        <th>% Group</th>
+    </tr>
+"""
+
+for group in unit_counts["Group"].unique():
+    group_df = unit_counts[unit_counts["Group"] == group]
+    group_row = group_summary[group_summary["Group"] == group].iloc[0]
+    group_percent = group_row["Group_Percent_Compliant"]
+
+    styled_html += f"""
+    <tr class='group-row'>
+        <td>{group}</td>
+        <td colspan='4'></td>
+        <td>{group_percent:.1f}%</td>
+    </tr>
+    """
+
+    for _, row in group_df.iterrows():
+        css_class = "compliant" if row["Compliant"] == "Yes" else "noncompliant"
+        styled_html += f"""
+        <tr class='{css_class}'>
+            <td></td>
+            <td>{row['Squadron_Name']}</td>
+            <td>{row['Compliant']}</td>
+            <td>{row['Members_with_Valid_TLC']}</td>
+            <td>{row['Total_Members']}</td>
+            <td></td>
+        </tr>
+        """
+
+styled_html += "</table>"
+
+# Convert HTML to PDF
+def convert_html_to_pdf(source_html):
+    output = BytesIO()
+    pisa_status = pisa.CreatePDF(source_html, dest=output)
+    return output if not pisa_status.err else None
+
+pdf_output = convert_html_to_pdf(styled_html)
+
+if pdf_output:
+    st.download_button(
+        label="Download PDF Report",
+        data=pdf_output.getvalue(),
+        file_name="TLC_Compliance_Report.pdf",
+        mime="application/pdf"
+    )
+else:
+    st.error("There was an error generating the PDF.")
