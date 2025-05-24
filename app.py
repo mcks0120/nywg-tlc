@@ -146,7 +146,7 @@ if uploaded_file is not None:
         st.dataframe(unit_counts)
 
         
-        )
+        
 
     except Exception as e:
         st.error(f"Error processing file: {e}")
