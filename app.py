@@ -238,7 +238,7 @@ timestamp = datetime.now().strftime("%B %d, %Y %I:%M %p")
 html_string = f"""
 <style>
     table, th, td {{
-        border: 1px solid black;
+        border: 1px; solid black;
         border-collapse: collapse;
         padding: 6px;
         font-size: 13px;
