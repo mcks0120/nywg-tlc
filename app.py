@@ -238,11 +238,20 @@ timestamp = datetime.now().strftime("%B %d, %Y %I:%M %p")
 html_string = f"""
 <style>
     table, th, td {{
-        border: 3px; solid black;
+        border: 3px solid black;
         border-collapse: collapse;
         padding: 6px;
         font-size: 13px;
     }}
+    th {{
+        background-color: #f2f2f2;
+    }}
+    .group-row {{
+        background-color: #e0e0e0;
+        font-weight: bold;
+    }}
+</style>
+"""
     th {{
         background-color: #f2f2f2;
     }}
