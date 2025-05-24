@@ -77,8 +77,8 @@ if uploaded_file is not None:
             self.set_font("Arial", "", 10)
             col_widths = [30, 60, 30, 30, 30]
             for i, col in enumerate(dataframe.columns):
-    width = 30 if i >= len(col_widths) else col_widths[i]
-    self.cell(width, 8, str(col), border=1, align="C")
+                width = 30 if i >= len(col_widths) else col_widths[i]
+                self.cell(width, 8, str(col), border=1, align="C")
             self.ln()
             col_widths = [30, 60, 30, 30, 30]
             for _, row in dataframe.iterrows():
