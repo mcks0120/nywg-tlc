@@ -145,13 +145,7 @@ if uploaded_file is not None:
         st.subheader("Members with Valid TLC per Unit")
         st.dataframe(unit_counts)
 
-        output = BytesIO()
-        unit_counts.to_excel(output, index=False)
-        st.download_button(
-            label="Download Excel Report",
-            data=output.getvalue(),
-            file_name="tlcreport.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        
         )
 
     except Exception as e:
