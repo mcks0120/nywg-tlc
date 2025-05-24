@@ -59,7 +59,7 @@ unit_reference_data = [
     {'Group': 'WNY', 'Unit Name': 'Niagara Frontier Senior Squadron', 'Unit Type': 'flight', 'Unit Number': 'NER-NY-343'},
     {'Group': 'WNY', 'Unit Name': 'Dunkirk Composite Squadron', 'Unit Type': 'comp', 'Unit Number': 'NER-NY-351'},
     {'Group': 'WNY', 'Unit Name': 'Jamestown Composite Squadron', 'Unit Type': 'comp', 'Unit Number': 'NER-NY-402'},
-    {'Group': 'WNY', 'Unit Name': 'Buffalo Creek Academy Cadet Sq', 'Unit Type': 'cadet', 'Unit Number': 'NER-NY-824'},
+    {'Group': 'WNY', 'Unit Name': 'Buffalo Creek Academy Cadet Sq', 'Unit Type': 'cadet', 'Unit Number': 'NER-NY-614'},
     {'Group': 'SEG', 'Unit Name': 'South Eastern Group', 'Unit Type': 'group', 'Unit Number': 'NER-NY-118'},
     {'Group': 'SEG', 'Unit Name': 'Putnam County Composite', 'Unit Type': 'comp', 'Unit Number': 'NER-NY-033'}
 ]
