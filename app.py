@@ -32,7 +32,7 @@ unit_data = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(unit_data)
 unit_df = pd.DataFrame(unit_data.unit_reference_data)
 
-# === Normalize unit numbers for matching (remove "NER-" from both sides) ===
+# === Normalize unit numbers for matching (remove "NER-" from both sources) ===
 unit_df["Unit Number"] = unit_df["Unit Number"].str.replace("NER-", "", regex=False)
 tlc_counts["Unit Number"] = tlc_counts["Unit Number"].str.replace("NER-", "", regex=False)
 
@@ -44,10 +44,18 @@ report_df = unit_df.merge(tlc_counts, on="Unit Number", how="left").fillna({"Mem
 report_df["Members_with_Valid_TLC"] = report_df["Members_with_Valid_TLC"].astype(int)
 report_df["TLC_Compliant"] = report_df["Members_with_Valid_TLC"] >= 2
 
-# === Export results ===
-excel_output = "tlc_unit_compliance_report.xlsx"
-csv_output = "tlc_unit_compliance_report.csv"
-report_df.to_excel(excel_output, index=False)
-report_df.to_csv(csv_output, index=False)
+# === Split compliant and non-compliant reports ===
+non_compliant_df = report_df[report_df["TLC_Compliant"] == False]
 
-print(f"Reports saved as:\n- {excel_output}\n- {csv_output}")
+# === Export results ===
+report_df.to_excel("tlc_unit_compliance_report.xlsx", index=False)
+report_df.to_csv("tlc_unit_compliance_report.csv", index=False)
+
+non_compliant_df.to_excel("tlc_non_compliant_units.xlsx", index=False)
+non_compliant_df.to_csv("tlc_non_compliant_units.csv", index=False)
+
+print("Reports saved as:")
+print("- tlc_unit_compliance_report.xlsx")
+print("- tlc_unit_compliance_report.csv")
+print("- tlc_non_compliant_units.xlsx")
+print("- tlc_non_compliant_units.csv")
