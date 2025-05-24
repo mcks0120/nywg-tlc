@@ -29,9 +29,7 @@ if uploaded_file is not None:
         (tlc["Advanced_Date"] >= cutoff)
     )
 
-    unit_reference_data = [
-    {'Group': 'hq', 'Unit Name': 'NY Wing HQ Squadron, inactive', 'Unit Type': 'comp', 'Unit Number': 'NY-000'},
-    ...
+    from unit_reference_data import unit_reference_data
 ]
     units = pd.DataFrame(unit_reference_data)
     units["Unit Type"] = units["Unit Type"].str.lower().str.strip()
