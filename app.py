@@ -13,7 +13,7 @@ st.markdown("Upload the **TLC_Progression.csv** to see which units are non-compl
 # Load unit reference data
 @st.cache_data
 def load_unit_reference():
-    spec = importlib.util.spec_from_file_location("unit_reference_data", "unit_reference_data.py")
+    spec = importlib.util.spec_from_file_location("unit_reference_data.py", "unit_reference_data.py")
     unit_ref = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(unit_ref)
     df = pd.DataFrame(unit_ref.unit_reference_data)
