@@ -1,97 +1,69 @@
+# app.py
 
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
-from fpdf import FPDF
-import io
+import importlib.util
 
-st.set_page_config(page_title="NYWG TLC Compliance Checker", layout="wide")
-st.title("Civil Air Patrol - NYWG TLC Compliance Checker")
+st.set_page_config(page_title="NYWG TLC Compliance Dashboard", layout="wide")
 
-uploaded_file = st.file_uploader("Upload TLC Progression CSV", type=["csv"])
+st.title("NYWG Training Leaders of Cadets Compliance Dashboard")
+st.markdown("Upload the **TLC_Progression.csv** to see which units are non-compliant. Compliance requires at least two members with valid TLC (Basic, Intermediate, or Advanced) within the past 4 years.")
 
-if uploaded_file is not None:
-    tlc = pd.read_csv(uploaded_file)
-    st.success("CSV successfully uploaded and processed.")
+# Load unit reference data
+@st.cache_data
+def load_unit_reference():
+    spec = importlib.util.spec_from_file_location("unit_reference_data", "unit_reference_data.py")
+    unit_ref = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(unit_ref)
+    df = pd.DataFrame(unit_ref.unit_reference_data)
+    df = df[df['Unit Type'].isin(['cadet', 'comp', 'flight'])]
+    return df
 
-    cutoff = datetime.now() - timedelta(days=4 * 365)
+unit_df = load_unit_reference()
 
-    # Convert date columns
-    tlc["OnDemand_Date"] = pd.to_datetime(tlc["OnDemandCompleted"], errors='coerce')
-    tlc["Basic_Date"] = pd.to_datetime(tlc["BasicCompleted"], errors='coerce')
-    tlc["Intermediate_Date"] = pd.to_datetime(tlc["IntCompleted"], errors='coerce')
-    tlc["Advanced_Date"] = pd.to_datetime(tlc["AdvCompleted"], errors='coerce')
+uploaded_file = st.file_uploader("Upload TLC_Progression.csv", type=["csv"])
 
-    tlc["TLC_Valid"] = (
-        (tlc["OnDemand_Date"] >= cutoff) |
-        (tlc["Basic_Date"] >= cutoff) |
-        (tlc["Intermediate_Date"] >= cutoff) |
-        (tlc["Advanced_Date"] >= cutoff)
+if uploaded_file:
+    tlc_df = pd.read_csv(uploaded_file)
+
+    # Convert dates
+    date_columns = ['OnDemandCompleted', 'BasicCompleted', 'IntCompleted', 'AdvCompleted']
+    for col in date_columns:
+        if col in tlc_df.columns:
+            tlc_df[col] = pd.to_datetime(tlc_df[col], errors='coerce')
+
+    expiration_threshold = datetime.now() - timedelta(days=4*365)
+
+    # Determine if member has any valid TLC
+    tlc_df['HasValidTLC'] = tlc_df[date_columns].apply(
+        lambda row: any(pd.notnull(date) and date > expiration_threshold for date in row), axis=1
     )
 
-    from unit_reference_data import unit_reference_data
-]
-    units = pd.DataFrame(unit_reference_data)
-    units["Unit Type"] = units["Unit Type"].str.lower().str.strip()
+    valid_tlc_df = tlc_df[tlc_df['HasValidTLC']]
+    tlc_counts = valid_tlc_df.groupby('Organization').size().reset_index(name='Valid TLC Count')
 
-    eligible_units = units[units["Unit Type"].isin({"cadet", "composite", "flight"})]
-    valid_counts = tlc[tlc["TLC_Valid"]].groupby("Organization")["CAPID"].nunique().reset_index()
-    valid_counts.columns = ["Unit Number", "Valid TLC Count"]
+    # Merge with unit data
+    unit_status_df = unit_df.merge(
+        tlc_counts, left_on='Unit Number', right_on='Organization', how='left'
+    ).fillna({'Valid TLC Count': 0})
+    unit_status_df['Valid TLC Count'] = unit_status_df['Valid TLC Count'].astype(int)
+    unit_status_df['TLC Compliant'] = unit_status_df['Valid TLC Count'] >= 2
 
-    report = eligible_units.merge(valid_counts, on="Unit Number", how="left")
-    report["Valid TLC Count"] = report["Valid TLC Count"].fillna(0).astype(int)
-    report["Compliance"] = report["Valid TLC Count"].apply(lambda x: "Compliant" if x >= 2 else "Non-Compliant")
+    non_compliant_units = unit_status_df[~unit_status_df['TLC Compliant']]
+    compliant_units = unit_status_df[unit_status_df['TLC Compliant']]
 
-    st.dataframe(report)
+    st.subheader("Non-Compliant Units")
+    st.dataframe(non_compliant_units[['Group', 'Unit Name', 'Unit Type', 'Unit Number', 'Valid TLC Count']])
 
-    # CSV Export
-    csv = report.to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="Download CSV Report",
-        data=csv,
-        file_name="NYWG_TLC_Compliance_Report.csv",
+        label="Download Non-Compliant Units as CSV",
+        data=non_compliant_units.to_csv(index=False).encode(),
+        file_name="non_compliant_units.csv",
         mime="text/csv"
     )
 
-    # PDF Export
-    class PDF(FPDF):
-        def header(self):
-            self.set_font("Arial", "B", 12)
-            self.cell(0, 10, "CAP TLC Compliance Report", ln=True, align="C")
-            self.ln(5)
-
-        def footer(self):
-            self.set_y(-15)
-            self.set_font("Arial", "I", 8)
-            self.cell(0, 10, f"Page {self.page_no()}", align="C")
-
-        def create_table(self, dataframe):
-            self.set_font("Arial", "", 10)
-            col_widths = [30, 60, 30, 30, 30]
-            for i, col in enumerate(dataframe.columns):
-                width = 30 if i >= len(col_widths) else col_widths[i]
-                self.cell(width, 8, str(col), border=1, align="C")
-            self.ln()
-            col_widths = [30, 60, 30, 30, 30]
-            for _, row in dataframe.iterrows():
-                self.cell(col_widths[0], 8, str(row["Group"]), border=1)
-                self.cell(col_widths[1], 8, str(row["Unit Name"]), border=1)
-                self.cell(col_widths[2], 8, str(row["Unit Number"]), border=1)
-                self.cell(col_widths[3], 8, str(row["Valid TLC Count"]), border=1, align="C")
-                self.cell(col_widths[4], 8, str(row["Compliance"]), border=1, align="C")
-                self.ln()
-
-    pdf = PDF()
-    pdf.add_page()
-    pdf.create_table(report)
-
-    pdf_buffer = io.BytesIO()
-    pdf.output(pdf_buffer)
-    pdf_bytes = pdf_buffer.getvalue()
-
-    st.download_button(
-        label="Download PDF Report",
-        data=pdf_bytes,
-        file_name="NYWG_TLC_Compliance_Report.pdf",
-        mime="application/pdf"
-    )
+    with st.expander("Show All Units (including compliant)"):
+        st.dataframe(unit_status_df[['Group', 'Unit Name', 'Unit Type', 'Unit Number', 'Valid TLC Count', 'TLC Compliant']])
+else:
+    st.info("Awaiting file upload.")
