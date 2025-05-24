@@ -49,9 +49,7 @@ if uploaded_file:
     html = """
     <style>
         table, th, td { border: 1px solid black; border-collapse: collapse; padding: 6px; font-size: 12px; }
-        .group-row { background-color: #d9d9d9; font-weight: bold; }
-        .compliant { background-color: #d4edda; }
-        .noncompliant { background-color: #f8d7da; }
+        .group-row { background-color: #f2f2f2; font-weight: bold; }
     </style>
     <table>
         <tr><th>Group</th><th>Squadron</th><th>Compliant</th><th>Valid TLC</th><th>Total</th></tr>
@@ -61,8 +59,7 @@ if uploaded_file:
         html += f"<tr class='group-row'><td>{group}</td><td colspan='4'></td></tr>"
         group_df = unit_counts[unit_counts["Group"] == group]
         for _, row in group_df.iterrows():
-            css_class = "compliant" if row["Compliant"] == "Yes" else "noncompliant"
-            html += f"<tr class='{css_class}'><td></td><td>{row['Squadron']}</td><td>{row['Compliant']}</td><td>{row['Members_with_Valid_TLC']}</td><td>{row['Total_Members']}</td></tr>"
+            html += f"<tr><td></td><td>{row['Squadron']}</td><td>{row['Compliant']}</td><td>{row['Members_with_Valid_TLC']}</td><td>{row['Total_Members']}</td></tr>"
 
     html += "</table>"
     st.markdown(html, unsafe_allow_html=True)
