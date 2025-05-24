@@ -37,7 +37,7 @@ unit_reference_data = [
     {'Group': 'MEG', 'Unit Name': 'Mid-Eastern Group', 'Unit Type': 'group', 'Unit Number': 'NY-043'},
     {'Group': 'MEG', 'Unit Name': 'Schenectady Composite Squadron', 'Unit Type': 'comp', 'Unit Number': 'NY-073'},
     {'Group': 'MEG', 'Unit Name': 'Albany Senior Squadron', 'Unit Type': 'senior', 'Unit Number': 'NY-361'},
-    {'Group': 'MEG', 'Unit Name': 'James P. O'Conner Composite', 'Unit Type': 'comp', 'Unit Number': 'NY-388'},
+    {'Group': 'MEG', 'Unit Name': 'James P. O'Connor Composite', 'Unit Type': 'comp', 'Unit Number': 'NY-388'},
     {'Group': 'MEG', 'Unit Name': 'Vanguard Composite Squadron', 'Unit Type': 'comp', 'Unit Number': 'NY-390'},
     {'Group': 'MEG', 'Unit Name': 'Vedder Composite Squadron', 'Unit Type': 'comp', 'Unit Number': 'NY-392'},
     {'Group': 'MEG', 'Unit Name': 'Capt Luke C. Wullenwaber Composite', 'Unit Type': 'comp', 'Unit Number': 'NY-415'},
