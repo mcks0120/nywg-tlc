@@ -39,6 +39,9 @@ report_df = unit_df.merge(tlc_counts, on="Unit Number", how="left").fillna({"Mem
 report_df["Members_with_Valid_TLC"] = report_df["Members_with_Valid_TLC"].astype(int)
 report_df["TLC_Compliant"] = report_df["Members_with_Valid_TLC"] >= 2
 
+# === Update Unit Number format to NER-NY-XXX ===
+report_df["Unit Number"] = report_df["Unit Number"].apply(lambda x: f"NER-{x}")
+
 # === Export results ===
 excel_output = "tlc_unit_compliance_report.xlsx"
 csv_output = "tlc_unit_compliance_report.csv"
